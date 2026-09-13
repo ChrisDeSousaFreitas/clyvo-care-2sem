@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import { usePets } from '../hooks/usePets';
+import { colors } from '../theme/colors';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function PetsListScreen() {
   const { query, createMutation, deleteMutation } = usePets();
@@ -8,35 +10,53 @@ export default function PetsListScreen() {
   const [especie, setEspecie] = useState('');
 
   const handleAddPet = () => {
-    createMutation.mutate({ nome, especie });
-    setNome('');
-    setEspecie('');
+    if(nome && especie) {
+      createMutation.mutate({ nome, especie });
+      setNome(''); setEspecie('');
+    }
   };
-
-  if (query.isLoading) return <ActivityIndicator size="large" style={{ flex: 1 }} />;
 
   return (
     <View style={styles.container}>
-      <TextInput placeholder="Nome do Pet" value={nome} onChangeText={setNome} style={styles.input} />
-      <TextInput placeholder="Espécie (Cachorro, Aranha...)" value={especie} onChangeText={setEspecie} style={styles.input} />
-      <Button title="Cadastrar Pet" onPress={handleAddPet} disabled={createMutation.isPending} />
+      <View style={styles.form}>
+        <TextInput placeholder="Nome do Pet" value={nome} onChangeText={setNome} style={styles.input} placeholderTextColor={colors.textLight} />
+        <TextInput placeholder="Espécie (Ex: Tarântula)" value={especie} onChangeText={setEspecie} style={styles.input} placeholderTextColor={colors.textLight} />
+        <TouchableOpacity style={styles.btnCreate} onPress={handleAddPet} disabled={createMutation.isPending}>
+          <Ionicons name="add" size={24} color={colors.surface} />
+        </TouchableOpacity>
+      </View>
 
-      <FlatList
-        data={query.data}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text>{item.nome} ({item.especie})</Text>
-            <Button title="Excluir" color="red" onPress={() => deleteMutation.mutate(item.id)} />
-          </View>
-        )}
-      />
+      {query.isLoading ? (
+        <ActivityIndicator size="large" color={colors.secondary} style={{ marginTop: 40 }} />
+      ) : (
+        <FlatList
+          data={query.data}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          renderItem={({ item }) => (
+            <View style={styles.petCard}>
+              <View style={styles.petInfo}>
+                <Text style={styles.petName}>{item.nome}</Text>
+                <Text style={styles.petSpecies}>{item.especie}</Text>
+              </View>
+              <TouchableOpacity onPress={() => deleteMutation.mutate(item.id)} style={styles.btnDelete}>
+                <Ionicons name="trash-outline" size={20} color={colors.danger} />
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 },
-  card: { padding: 15, borderWidth: 1, marginTop: 10, flexDirection: 'row', justifyContent: 'space-between' }
+  container: { flex: 1, padding: 20, backgroundColor: colors.background },
+  form: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 20 },
+  input: { backgroundColor: colors.surface, width: '40%', padding: 12, borderRadius: 10, borderWidth: 1, borderColor: '#EEE' },
+  btnCreate: { backgroundColor: colors.secondary, width: '15%', borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
+  petCard: { backgroundColor: colors.surface, padding: 20, borderRadius: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.05, elevation: 3 },
+  petName: { fontSize: 18, fontWeight: 'bold', color: colors.primary },
+  petSpecies: { fontSize: 14, color: colors.textLight, marginTop: 4 },
+  btnDelete: { padding: 10, backgroundColor: '#FFF0F0', borderRadius: 8 }
 });
