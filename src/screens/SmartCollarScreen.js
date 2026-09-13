@@ -8,10 +8,8 @@ export default function SmartCollarScreen({ navigation }) {
   const [isStressed, setIsStressed] = useState(false);
 
   useEffect(() => {
-    // Se estressado, o pulso bate mais rápido (150ms), senão bate normal (400ms)
     const speed = isStressed ? 150 : 400; 
     
-    // Animação em loop infinito
     const pulseLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(scaleAnim, { toValue: 1.3, duration: speed, useNativeDriver: true }),
@@ -21,7 +19,6 @@ export default function SmartCollarScreen({ navigation }) {
     
     pulseLoop.start();
 
-    // Limpa a animação caso a tela seja desmontada
     return () => pulseLoop.stop();
   }, [scaleAnim, isStressed]);
 
@@ -30,8 +27,7 @@ export default function SmartCollarScreen({ navigation }) {
   const pulseBackground = isStressed ? 'rgba(230, 57, 70, 0.3)' : 'rgba(28, 141, 163, 0.2)';
 
   return (
-    <View style={styles.container}>
-      {/* Botão de Voltar */}
+    <View style={styles.container}>  
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color={colors.primary} />
       </TouchableOpacity>
@@ -41,7 +37,6 @@ export default function SmartCollarScreen({ navigation }) {
       </Text>
       
       <View style={styles.radarContainer}>
-        {/* Círculo expansivo animado */}
         <Animated.View 
           style={[
             styles.pulseCircle, 
@@ -52,7 +47,6 @@ export default function SmartCollarScreen({ navigation }) {
           ]} 
         />
         
-        {/* Círculo central fixo */}
         <View style={[styles.innerCircle, { shadowColor: currentColor }]}>
           <Ionicons name={isStressed ? "warning" : "heart"} size={50} color={currentColor} />
           <Text style={styles.bpmText}>{currentBpm}</Text>

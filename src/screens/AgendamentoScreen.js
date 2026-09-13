@@ -13,7 +13,6 @@ const mockTimeline = [
 export default function AgendamentoScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      {/* Botão de Voltar */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color={colors.primary} />
       </TouchableOpacity>
@@ -31,13 +30,11 @@ export default function AgendamentoScreen({ navigation }) {
           
           return (
             <View style={styles.timelineRow}>
-              {/* Coluna da Linha e Nó (Bolinha) */}
               <View style={styles.nodeColumn}>
                 <View style={[styles.node, { backgroundColor: isDone ? colors.secondary : colors.accent }]} />
                 {!isLast && <View style={styles.line} />}
               </View>
               
-              {/* Cartão de Informação */}
               <View style={[styles.card, !isDone && styles.cardHighlight]}>
                 <Text style={styles.date}>{item.data}</Text>
                 <Text style={styles.type}>{item.tipo}</Text>

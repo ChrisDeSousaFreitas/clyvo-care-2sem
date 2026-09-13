@@ -31,7 +31,6 @@ export default function CadastroScreen({ navigation }) {
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.container}>
         
-        {/* BOTÃO 1: Ícone de voltar no topo (corrigido para ir direto ao Login) */}
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Login')}>
           <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
@@ -55,12 +54,10 @@ export default function CadastroScreen({ navigation }) {
           <TextInput placeholder="Mínimo 6 caracteres" onChangeText={setSenha} style={styles.input} secureTextEntry placeholderTextColor={colors.textLight} />
         </View>
         
-        {/* Botão de Finalizar Cadastro */}
         <TouchableOpacity style={styles.btnPrimary} onPress={handleCadastro} disabled={loading}>
           {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>Finalizar Cadastro</Text>}
         </TouchableOpacity>
 
-        {/* BOTÃO 2: Texto na parte inferior (corrigido para ir direto ao Login) */}
         <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.btnSecondary}>
           <Text style={styles.btnTextSecondary}>Já tenho uma conta. Fazer Login</Text>
         </TouchableOpacity>

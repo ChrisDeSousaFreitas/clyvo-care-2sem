@@ -20,7 +20,6 @@ export default function LoginScreen({ navigation }) {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
       
-      {/* METADE SUPERIOR - Fundo Escuro com Destaque para a Marca */}
       <View style={styles.topSection}>
         <View style={styles.iconBackground}>
           <Ionicons name="paw" size={60} color={colors.secondary} />
@@ -29,7 +28,6 @@ export default function LoginScreen({ navigation }) {
         <Text style={styles.brandText}>CLYVO CARE</Text>
       </View>
 
-      {/* METADE INFERIOR - Cartão Arredondado (Bottom Sheet) */}
       <View style={styles.bottomSheet}>
         <Text style={styles.sheetTitle}>Acesse sua conta</Text>
         
@@ -62,23 +60,20 @@ export default function LoginScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  // Fundo principal agora é a cor primária (Azul Escuro)
   container: { flex: 1, backgroundColor: colors.primary },
   
-  // Estilos da parte de cima
   topSection: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 20 },
   iconBackground: { backgroundColor: colors.surface, padding: 20, borderRadius: 30, marginBottom: 20, shadowColor: colors.secondary, shadowOpacity: 0.5, shadowRadius: 15, elevation: 10 },
   welcomeText: { fontSize: 18, color: colors.surface, opacity: 0.8, marginBottom: 5 },
   brandText: { fontSize: 36, fontWeight: '900', color: colors.surface, letterSpacing: 2 },
   
-  // Estilos do Cartão Inferior
   bottomSheet: { 
     backgroundColor: colors.surface, 
     borderTopLeftRadius: 40, 
     borderTopRightRadius: 40, 
     padding: 30, 
     paddingTop: 40,
-    paddingBottom: 50, // Garante espaço no final
+    paddingBottom: 50,
     shadowColor: '#000', 
     shadowOpacity: 0.2, 
     shadowRadius: 20, 
