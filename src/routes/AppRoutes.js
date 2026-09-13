@@ -4,11 +4,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../hooks/useAuth';
 
-// Telas Públicas
 import LoginScreen from '../screens/LoginScreen';
 import CadastroScreen from '../screens/CadastroScreen';
 
-// Telas Privadas
 import HomeScreen from '../screens/HomeScreen';
 import PetsListScreen from '../screens/PetsListScreen';
 import AgendamentoScreen from '../screens/AgendamentoScreen';
