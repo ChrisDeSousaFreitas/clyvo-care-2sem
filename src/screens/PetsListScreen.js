@@ -5,13 +5,12 @@ import { colors } from '../theme/colors';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Skeleton from '../components/Skeleton';
 
-export default function PetsListScreen() {
-  // ATENÇÃO: Certifique-se de que seu usePets() exporta a updateMutation
+export default function PetsListScreen({ navigation }) {
   const { query, createMutation, deleteMutation, updateMutation } = usePets();
   
   const [nome, setNome] = useState('');
   const [especie, setEspecie] = useState('Cachorro');
-  const [editandoId, setEditandoId] = useState(null); // Estado para controlar edição
+  const [editandoId, setEditandoId] = useState(null);
 
   const especiesOptions = [
     { nome: 'Cachorro', icon: 'dog' },
@@ -20,9 +19,7 @@ export default function PetsListScreen() {
     { nome: 'Pássaro', icon: 'bird' }
   ];
 
-const handleSavePet = () => {
-    console.log("Valores atuais:", nome, especie);
-    
+  const handleSavePet = () => {
     if (nome && especie) {
       if (editandoId) {
         updateMutation.mutate({ id: editandoId, nome, especie });
@@ -95,10 +92,14 @@ const handleSavePet = () => {
           contentContainerStyle={{ paddingBottom: 20 }}
           renderItem={({ item }) => (
             <View style={styles.petCard}>
-              <View style={styles.petInfo}>
+              <TouchableOpacity 
+                style={styles.petInfo} 
+                onPress={() => navigation.navigate('PetProfile', { pet: item })}
+              >
                 <Text style={styles.petName}>{item.nome}</Text>
                 <Text style={styles.petSpecies}>{item.especie}</Text>
-              </View>
+                <Text style={styles.hologramText}>Ver ficha holográfica ✨</Text>
+              </TouchableOpacity>
               <View style={styles.actionButtons}>
                 <TouchableOpacity onPress={() => iniciarEdicao(item)} style={styles.btnEdit}>
                   <Ionicons name="pencil-outline" size={20} color={colors.primary} />
@@ -128,6 +129,7 @@ const styles = StyleSheet.create({
   petInfo: { flex: 1 },
   petName: { fontSize: 18, fontWeight: 'bold', color: colors.primary },
   petSpecies: { fontSize: 14, color: colors.textLight, marginTop: 4 },
+  hologramText: { color: colors.secondary, fontSize: 12, marginTop: 5 },
   actionButtons: { flexDirection: 'row', gap: 10 },
   btnEdit: { padding: 10, backgroundColor: '#E2E8F0', borderRadius: 10 },
   btnDelete: { padding: 10, backgroundColor: '#FFF0F0', borderRadius: 10 }

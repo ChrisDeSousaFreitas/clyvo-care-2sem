@@ -11,6 +11,7 @@ import HomeScreen from '../screens/HomeScreen';
 import PetsListScreen from '../screens/PetsListScreen';
 import AgendamentoScreen from '../screens/AgendamentoScreen';
 import SmartCollarScreen from '../screens/SmartCollarScreen';
+import PetProfileScreen from '../screens/PetProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +35,7 @@ export default function AppRoutes() {
             <Stack.Screen name="Pets" component={PetsListScreen} />
             <Stack.Screen name="Agendamentos" component={AgendamentoScreen} />
             <Stack.Screen name="Collar" component={SmartCollarScreen} />
+            <Stack.Screen name="PetProfile" component={PetProfileScreen} />
           </>
         ) : (
           <>
