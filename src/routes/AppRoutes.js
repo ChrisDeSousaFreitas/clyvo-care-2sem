@@ -1,11 +1,14 @@
 import React from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../hooks/useAuth';
-import { ActivityIndicator, View } from 'react-native';
 
+// Telas Públicas
 import LoginScreen from '../screens/LoginScreen';
 import CadastroScreen from '../screens/CadastroScreen';
+
+// Telas Privadas
 import HomeScreen from '../screens/HomeScreen';
 import PetsListScreen from '../screens/PetsListScreen';
 import AgendamentoScreen from '../screens/AgendamentoScreen';
@@ -16,11 +19,17 @@ const Stack = createNativeStackNavigator();
 export default function AppRoutes() {
   const { user, isLoading } = useAuth();
 
-  if (isLoading) return <View style={{ flex: 1, justifyContent: 'center' }}><ActivityIndicator size="large" /></View>;
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F4F7F6' }}>
+        <ActivityIndicator size="large" color="#1C8DA3" />
+      </View>
+    );
+  }
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
         {user ? (
           <>
             <Stack.Screen name="Home" component={HomeScreen} />

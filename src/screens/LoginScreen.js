@@ -1,77 +1,94 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
 import { colors } from '../theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function CadastroScreen({ navigation }) {
-  const [nome, setNome] = useState('');
-  const [telefone, setTelefone] = useState('');
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const { register } = useAuth();
+  const { login } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  const handleCadastro = async () => {
-    if (!email || !senha || !nome) {
-      alert('Preencha os campos obrigatórios.');
-      return;
-    }
+  const handleLogin = async () => {
     setLoading(true);
-    try { 
-      await register(email, senha); 
-    } catch (error) { 
-      alert('Erro ao criar conta. Tente uma senha com 6+ caracteres.'); 
-    } finally { 
-      setLoading(false); 
-    }
+    try { await login(email, senha); } 
+    catch (error) { alert('Falha no acesso. Verifique seus dados.'); }
+    finally { setLoading(false); }
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={styles.container}>
-        
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.primary} />
-        </TouchableOpacity>
-
-        <View style={styles.header}>
-          <Text style={styles.title}>Junte-se à Clyvo</Text>
-          <Text style={styles.subtitle}>Crie sua conta e comece a monitorar a saúde dos seus pets.</Text>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
+      
+      {/* METADE SUPERIOR - Fundo Escuro com Destaque para a Marca */}
+      <View style={styles.topSection}>
+        <View style={styles.iconBackground}>
+          <Ionicons name="paw" size={60} color={colors.secondary} />
         </View>
+        <Text style={styles.welcomeText}>Bem-vindo ao</Text>
+        <Text style={styles.brandText}>CLYVO CARE</Text>
+      </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Nome do Tutor *</Text>
-          <TextInput placeholder="Como devemos te chamar?" onChangeText={setNome} style={styles.input} placeholderTextColor={colors.textLight} />
-          
-          <Text style={styles.label}>Telefone (Opcional)</Text>
-          <TextInput placeholder="(11) 90000-0000" onChangeText={setTelefone} style={styles.input} keyboardType="phone-pad" placeholderTextColor={colors.textLight} />
-
-          <Text style={styles.label}>E-mail de Acesso *</Text>
-          <TextInput placeholder="seu@email.com" onChangeText={setEmail} style={styles.input} autoCapitalize="none" keyboardType="email-address" placeholderTextColor={colors.textLight} />
-          
-          <Text style={styles.label}>Senha Segura *</Text>
-          <TextInput placeholder="Mínimo 6 caracteres" onChangeText={setSenha} style={styles.input} secureTextEntry placeholderTextColor={colors.textLight} />
-        </View>
+      {/* METADE INFERIOR - Cartão Arredondado (Bottom Sheet) */}
+      <View style={styles.bottomSheet}>
+        <Text style={styles.sheetTitle}>Acesse sua conta</Text>
         
-        <TouchableOpacity style={styles.btnPrimary} onPress={handleCadastro} disabled={loading}>
-          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>Finalizar Cadastro</Text>}
+        <TextInput 
+          placeholder="Seu E-mail" 
+          onChangeText={setEmail} 
+          style={styles.input} 
+          autoCapitalize="none" 
+          placeholderTextColor={colors.textLight} 
+        />
+        <TextInput 
+          placeholder="Sua Senha" 
+          onChangeText={setSenha} 
+          style={styles.input} 
+          secureTextEntry 
+          placeholderTextColor={colors.textLight} 
+        />
+        
+        <TouchableOpacity style={styles.btnPrimary} onPress={handleLogin} disabled={loading}>
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>Entrar no Sistema</Text>}
         </TouchableOpacity>
+        
+        <TouchableOpacity onPress={() => navigation.navigate('Cadastro')} style={styles.btnSecondary}>
+          <Text style={styles.btnTextSecondary}>Novo por aqui? <Text style={styles.highlightText}>Crie sua conta</Text></Text>
+        </TouchableOpacity>
+      </View>
 
-      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flexGrow: 1, padding: 25, backgroundColor: colors.background, justifyContent: 'center' },
-  backButton: { position: 'absolute', top: 50, left: 20, zIndex: 10, padding: 10, backgroundColor: colors.surface, borderRadius: 50, shadowColor: '#000', shadowOpacity: 0.1, elevation: 2 },
-  header: { marginTop: 60, marginBottom: 30 },
-  title: { fontSize: 32, fontWeight: '900', color: colors.primary, marginBottom: 8 },
-  subtitle: { fontSize: 16, color: colors.textLight, lineHeight: 22 },
-  formGroup: { marginBottom: 20 },
-  label: { fontSize: 14, fontWeight: 'bold', color: colors.secondary, marginBottom: 6, marginLeft: 4 },
-  input: { backgroundColor: colors.surface, borderWidth: 1, borderColor: '#E0E0E0', padding: 15, marginBottom: 18, borderRadius: 12, fontSize: 16, color: colors.text },
-  btnPrimary: { backgroundColor: colors.accent, padding: 18, borderRadius: 12, alignItems: 'center', shadowColor: colors.accent, shadowOpacity: 0.3, shadowRadius: 8, elevation: 4, marginTop: 10 },
-  btnText: { color: colors.surface, fontSize: 16, fontWeight: 'bold' }
+  // Fundo principal agora é a cor primária (Azul Escuro)
+  container: { flex: 1, backgroundColor: colors.primary },
+  
+  // Estilos da parte de cima
+  topSection: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 20 },
+  iconBackground: { backgroundColor: colors.surface, padding: 20, borderRadius: 30, marginBottom: 20, shadowColor: colors.secondary, shadowOpacity: 0.5, shadowRadius: 15, elevation: 10 },
+  welcomeText: { fontSize: 18, color: colors.surface, opacity: 0.8, marginBottom: 5 },
+  brandText: { fontSize: 36, fontWeight: '900', color: colors.surface, letterSpacing: 2 },
+  
+  // Estilos do Cartão Inferior
+  bottomSheet: { 
+    backgroundColor: colors.surface, 
+    borderTopLeftRadius: 40, 
+    borderTopRightRadius: 40, 
+    padding: 30, 
+    paddingTop: 40,
+    paddingBottom: 50, // Garante espaço no final
+    shadowColor: '#000', 
+    shadowOpacity: 0.2, 
+    shadowRadius: 20, 
+    elevation: 20 
+  },
+  sheetTitle: { fontSize: 22, fontWeight: 'bold', color: colors.primary, marginBottom: 25 },
+  input: { backgroundColor: colors.background, borderWidth: 1, borderColor: '#EEE', padding: 16, marginBottom: 15, borderRadius: 12, fontSize: 16, color: colors.text },
+  btnPrimary: { backgroundColor: colors.secondary, padding: 18, borderRadius: 12, alignItems: 'center', marginTop: 10, shadowColor: colors.secondary, shadowOpacity: 0.4, shadowRadius: 8, elevation: 5 },
+  btnText: { color: colors.surface, fontSize: 16, fontWeight: 'bold' },
+  btnSecondary: { marginTop: 20, alignItems: 'center' },
+  btnTextSecondary: { color: colors.textLight, fontSize: 15 },
+  highlightText: { color: colors.accent, fontWeight: 'bold' }
 });
