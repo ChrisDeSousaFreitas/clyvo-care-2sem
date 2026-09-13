@@ -10,11 +10,33 @@ export default function AgendamentoScreen({ navigation }) {
   const [data, setData] = useState('');
 
   const handleAgendar = () => {
-    if (tipo && data) {
-      createMutation.mutate({ tipo, data, status: 'pendente' });
-      setTipo('');
-      setData('');
+    if (!tipo.trim() || !data.trim()) {
+      alert('Atenção: Preencha qual é o procedimento e a data do agendamento.');
+      return;
     }
+
+    createMutation.mutate(
+      { tipo, data, status: 'pendente' },
+      {
+        onSuccess: () => {
+          setTipo('');
+          setData('');
+        },
+        onError: (error) => {
+          console.error("Erro no Agendamento:", error);
+          alert('Erro na API: O aplicativo não conseguiu salvar. Verifique se o seu backend Java está rodando e se o IP no hook está correto.');
+        }
+      }
+    );
+  };
+
+  const handleExcluir = (id) => {
+    deleteMutation.mutate(id, {
+      onError: (error) => {
+        console.error("Erro ao excluir:", error);
+        alert('Erro ao excluir: Falha na comunicação com o servidor.');
+      }
+    });
   };
 
   return (
@@ -25,12 +47,27 @@ export default function AgendamentoScreen({ navigation }) {
 
       <Text style={styles.title}>Histórico Clínico</Text>
 
-      {/* Formulário de Novo Agendamento */}
       <View style={styles.form}>
-        <TextInput placeholder="Ex: Vacina Raiva" value={tipo} onChangeText={setTipo} style={styles.input} />
-        <TextInput placeholder="Ex: 15 Out, 14:00" value={data} onChangeText={setData} style={styles.inputData} />
+        <TextInput 
+          placeholder="Ex: Vacina Raiva" 
+          value={tipo} 
+          onChangeText={setTipo} 
+          style={styles.input} 
+          placeholderTextColor={colors.textLight} 
+        />
+        <TextInput 
+          placeholder="Ex: 15 Out, 14:00" 
+          value={data} 
+          onChangeText={setData} 
+          style={styles.inputData} 
+          placeholderTextColor={colors.textLight} 
+        />
         <TouchableOpacity style={styles.btnAdd} onPress={handleAgendar} disabled={createMutation.isPending}>
-          <Ionicons name="add" size={24} color={colors.surface} />
+          {createMutation.isPending ? (
+            <ActivityIndicator size="small" color={colors.surface} />
+          ) : (
+            <Ionicons name="add" size={24} color={colors.surface} />
+          )}
         </TouchableOpacity>
       </View>
 
@@ -39,7 +76,7 @@ export default function AgendamentoScreen({ navigation }) {
       ) : (
         <FlatList
           data={query.data || []}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item) => item.id ? item.id.toString() : Math.random().toString()}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 30, marginTop: 10 }}
           renderItem={({ item, index }) => {
@@ -58,7 +95,7 @@ export default function AgendamentoScreen({ navigation }) {
                     <Text style={styles.date}>{item.data}</Text>
                     <Text style={styles.type}>{item.tipo}</Text>
                   </View>
-                  <TouchableOpacity onPress={() => deleteMutation.mutate(item.id)}>
+                  <TouchableOpacity onPress={() => handleExcluir(item.id)} disabled={deleteMutation.isPending}>
                     <Ionicons name="trash-outline" size={22} color={colors.danger} />
                   </TouchableOpacity>
                 </View>
@@ -76,8 +113,8 @@ const styles = StyleSheet.create({
   backButton: { marginTop: 30, marginBottom: 10, padding: 10, alignSelf: 'flex-start', backgroundColor: colors.surface, borderRadius: 50, elevation: 2 },
   title: { fontSize: 28, fontWeight: '900', color: colors.primary, marginBottom: 15 },
   form: { flexDirection: 'row', gap: 10, marginBottom: 20 },
-  input: { flex: 2, backgroundColor: colors.surface, padding: 12, borderRadius: 10, borderWidth: 1, borderColor: '#EEE' },
-  inputData: { flex: 1.5, backgroundColor: colors.surface, padding: 12, borderRadius: 10, borderWidth: 1, borderColor: '#EEE' },
+  input: { flex: 2, backgroundColor: colors.surface, padding: 12, borderRadius: 10, borderWidth: 1, borderColor: '#EEE', color: colors.text },
+  inputData: { flex: 1.5, backgroundColor: colors.surface, padding: 12, borderRadius: 10, borderWidth: 1, borderColor: '#EEE', color: colors.text },
   btnAdd: { backgroundColor: colors.secondary, padding: 12, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
   timelineRow: { flexDirection: 'row' },
   nodeColumn: { alignItems: 'center', width: 30 },

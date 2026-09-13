@@ -20,7 +20,9 @@ export default function PetsListScreen() {
     { nome: 'Pássaro', icon: 'bird' }
   ];
 
-  const handleSavePet = () => {
+const handleSavePet = () => {
+    console.log("Valores atuais:", nome, especie);
+    
     if (nome && especie) {
       if (editandoId) {
         updateMutation.mutate({ id: editandoId, nome, especie });
@@ -28,6 +30,8 @@ export default function PetsListScreen() {
         createMutation.mutate({ nome, especie });
       }
       resetForm();
+    } else {
+      alert('Preencha o nome e a espécie do pet!');
     }
   };
 

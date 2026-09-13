@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://github.com/Bruno-A-Z/JAVA-CHALLENGE-FIAP-2026.git',
+  baseURL: 'http://192.168.15.6:3080', 
 });
 
 export default api;
