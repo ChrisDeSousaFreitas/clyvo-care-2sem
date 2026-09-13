@@ -1,33 +1,72 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { usePets } from '../hooks/usePets';
 import { colors } from '../theme/colors';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import Skeleton from '../components/Skeleton';
 
 export default function PetsListScreen() {
   const { query, createMutation, deleteMutation } = usePets();
   const [nome, setNome] = useState('');
-  const [especie, setEspecie] = useState('');
+  const [especie, setEspecie] = useState('Cachorro');
+
+  const especiesOptions = [
+    { nome: 'Cachorro', icon: 'dog' },
+    { nome: 'Gato', icon: 'cat' },
+    { nome: 'Exótico', icon: 'spider' },
+    { nome: 'Pássaro', icon: 'bird' }
+  ];
 
   const handleAddPet = () => {
     if(nome && especie) {
       createMutation.mutate({ nome, especie });
-      setNome(''); setEspecie('');
+      setNome(''); 
+      setEspecie('Cachorro');
     }
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.form}>
-        <TextInput placeholder="Nome do Pet" value={nome} onChangeText={setNome} style={styles.input} placeholderTextColor={colors.textLight} />
-        <TextInput placeholder="Espécie (Ex: Tarântula)" value={especie} onChangeText={setEspecie} style={styles.input} placeholderTextColor={colors.textLight} />
-        <TouchableOpacity style={styles.btnCreate} onPress={handleAddPet} disabled={createMutation.isPending}>
-          <Ionicons name="add" size={24} color={colors.surface} />
-        </TouchableOpacity>
+      <View style={styles.formContainer}>
+        <View style={styles.inputRow}>
+          <TextInput 
+            placeholder="Nome do Pet" 
+            value={nome} 
+            onChangeText={setNome} 
+            style={styles.input} 
+            placeholderTextColor={colors.textLight} 
+          />
+          <TouchableOpacity style={styles.btnCreate} onPress={handleAddPet} disabled={createMutation.isPending}>
+            <Ionicons name="add" size={28} color={colors.surface} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.speciesSelector}>
+          {especiesOptions.map((opt) => {
+            const isSelected = especie === opt.nome;
+            return (
+              <TouchableOpacity 
+                key={opt.nome} 
+                onPress={() => setEspecie(opt.nome)}
+                style={[styles.speciesBtn, isSelected && styles.speciesBtnActive]}
+              >
+                <MaterialCommunityIcons 
+                  name={opt.icon} 
+                  size={28} 
+                  color={isSelected ? colors.surface : colors.textLight} 
+                />
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
 
       {query.isLoading ? (
-        <ActivityIndicator size="large" color={colors.secondary} style={{ marginTop: 40 }} />
+        <View style={{ marginTop: 10 }}>
+          <Skeleton width="100%" height={80} style={{ marginBottom: 12, borderRadius: 16 }} />
+          <Skeleton width="100%" height={80} style={{ marginBottom: 12, borderRadius: 16 }} />
+          <Skeleton width="100%" height={80} style={{ marginBottom: 12, borderRadius: 16 }} />
+        </View>
       ) : (
         <FlatList
           data={query.data}
@@ -51,12 +90,17 @@ export default function PetsListScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: colors.background },
-  form: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 20 },
-  input: { backgroundColor: colors.surface, width: '40%', padding: 12, borderRadius: 10, borderWidth: 1, borderColor: '#EEE' },
-  btnCreate: { backgroundColor: colors.secondary, width: '15%', borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
-  petCard: { backgroundColor: colors.surface, padding: 20, borderRadius: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.05, elevation: 3 },
+  container: { flex: 1, padding: 20, backgroundColor: colors.background, paddingTop: 50 },
+  formContainer: { marginBottom: 25 },
+  inputRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 },
+  input: { backgroundColor: colors.surface, flex: 1, marginRight: 15, padding: 15, borderRadius: 12, borderWidth: 1, borderColor: '#EEE', fontSize: 16, color: colors.text, elevation: 2, shadowColor: '#000', shadowOpacity: 0.05 },
+  btnCreate: { backgroundColor: colors.secondary, width: 60, borderRadius: 12, justifyContent: 'center', alignItems: 'center', shadowColor: colors.secondary, shadowOpacity: 0.3, elevation: 4 },
+  speciesSelector: { flexDirection: 'row', justifyContent: 'space-between', width: '100%' },
+  speciesBtn: { padding: 12, borderRadius: 12, backgroundColor: colors.surface, width: '22%', alignItems: 'center', borderWidth: 1, borderColor: '#EEE', elevation: 1 },
+  speciesBtnActive: { backgroundColor: colors.secondary, borderColor: colors.secondary, shadowColor: colors.secondary, elevation: 5 },
+  petCard: { backgroundColor: colors.surface, padding: 20, borderRadius: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.08, elevation: 3 },
+  petInfo: { flex: 1 },
   petName: { fontSize: 18, fontWeight: 'bold', color: colors.primary },
   petSpecies: { fontSize: 14, color: colors.textLight, marginTop: 4 },
-  btnDelete: { padding: 10, backgroundColor: '#FFF0F0', borderRadius: 8 }
+  btnDelete: { padding: 10, backgroundColor: '#FFF0F0', borderRadius: 10 }
 });
