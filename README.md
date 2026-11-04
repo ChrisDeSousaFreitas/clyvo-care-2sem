@@ -211,7 +211,7 @@ A tela **Clyvo IA** possui um modo de demonstração independente do endpoint de
 
 ## Versão e rastreabilidade
 
-Versão atual: **1.2.0**.
+Versão atual: **1.2.1**.
 
 A tela Sobre apresenta a versão e o hash de referência do build. Gere o APK a partir do commit que será entregue e confira se o hash exibido corresponde ao código publicado.
 

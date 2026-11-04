@@ -20,7 +20,7 @@ const KNOWLEDGE_BASE = [
     answer: 'Posso ajudar a organizar informações gerais, mas esta versão não faz diagnóstico e não analisa sintomas clinicamente. Se o pet apresentar dificuldade para respirar, convulsões, sangramento intenso, desmaio ou piora rápida, procure atendimento veterinário imediatamente.',
   },
   {
-    keywords: ['horario', 'horário', 'funciona', 'funcionamento'],
+    keywords: ['horario', 'horário', 'funcionamento'],
     answer: 'Não tenho horários de funcionamento cadastrados na minha base local. Consulte diretamente a equipe da clínica para confirmar essa informação.',
   },
   {
