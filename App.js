@@ -1,23 +1,18 @@
-import React from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import AppRoutes from './src/routes/AppRoutes';
-import { AuthProvider } from './src/hooks/useAuth';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </QueryClientProvider>
+    <View style={styles.container}>
+      <Text>Clyvo Mobile Rodando!</Text>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
