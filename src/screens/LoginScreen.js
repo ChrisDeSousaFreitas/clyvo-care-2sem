@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
+  View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator,
+  KeyboardAvoidingView, Platform, Alert,
 } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
 import { getApiErrorMessage } from '../api/axiosConfig';
@@ -38,60 +31,35 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       <View style={styles.hero}>
-        <View style={styles.logo}>
-          <Ionicons name="paw" size={46} color={colors.secondary} />
-        </View>
+        <View style={styles.logo}><Ionicons name="paw" size={46} color={colors.secondary} /></View>
         <Text style={styles.eyebrow}>GESTÃO CLÍNICA VETERINÁRIA</Text>
         <Text style={styles.brand}>CLYVO</Text>
         <Text style={styles.subtitle}>Cuidado inteligente, conectado e organizado.</Text>
       </View>
 
       <View style={styles.sheet}>
-        <Text style={styles.title}>Acesse seu painel</Text>
-        <Text style={styles.description}>
-          Entre com as credenciais cadastradas na API Clyvo.
-        </Text>
+        <Text style={styles.title}>Acesse o painel administrativo</Text>
+        <Text style={styles.description}>Entre com uma conta de perfil ADMIN cadastrada na API Clyvo.</Text>
 
         <Text style={styles.label}>Usuário</Text>
         <TextInput
-          placeholder="Seu usuário"
-          value={username}
-          onChangeText={setUsername}
-          style={styles.input}
-          placeholderTextColor={colors.textLight}
-          autoCapitalize="none"
-          autoCorrect={false}
-          textContentType="username"
-          returnKeyType="next"
+          placeholder="Seu usuário" value={username} onChangeText={setUsername}
+          style={styles.input} placeholderTextColor={colors.textLight}
+          autoCapitalize="none" autoCorrect={false} textContentType="username" returnKeyType="next"
         />
 
         <Text style={styles.label}>Senha</Text>
         <TextInput
-          placeholder="Sua senha"
-          value={password}
-          onChangeText={setPassword}
-          style={styles.input}
-          placeholderTextColor={colors.textLight}
-          secureTextEntry
-          textContentType="password"
-          returnKeyType="done"
+          placeholder="Sua senha" value={password} onChangeText={setPassword}
+          style={styles.input} placeholderTextColor={colors.textLight}
+          secureTextEntry textContentType="password" returnKeyType="done"
           onSubmitEditing={handleLogin}
         />
 
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={handleLogin}
-          disabled={loading}
-          accessibilityRole="button"
-        >
-          {loading ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
+        <TouchableOpacity style={[styles.button, loading && styles.buttonDisabled]} onPress={handleLogin} disabled={loading} accessibilityRole="button">
+          {loading ? <ActivityIndicator color="#FFFFFF" /> : (
             <>
               <Text style={styles.buttonText}>Entrar no sistema</Text>
               <Ionicons name="arrow-forward" size={19} color="#FFFFFF" />
@@ -101,7 +69,7 @@ export default function LoginScreen() {
 
         <View style={styles.securityNote}>
           <Ionicons name="shield-checkmark-outline" size={17} color={colors.secondary} />
-          <Text style={styles.securityText}>Sessão autenticada pela API e armazenada com segurança no dispositivo.</Text>
+          <Text style={styles.securityText}>Autenticação JWT pela API. A sessão é armazenada com segurança no dispositivo.</Text>
         </View>
       </View>
     </KeyboardAvoidingView>

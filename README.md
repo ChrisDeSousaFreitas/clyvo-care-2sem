@@ -52,11 +52,7 @@ O aplicativo autentica na API com `/auth/login`, recebe o token JWT e o guarda c
 
 **Não inclua tokens, senhas ou credenciais no código, no README, em variáveis `EXPO_PUBLIC_*` ou no GitHub.** O login usa as credenciais fornecidas pelo responsável pelo backend.
 
-A configuração atual do backend autoriza:
-- `ADMIN`: operações de tutores, pets, veterinários, agendamentos e consultas.
-- `VETERINARIO`: operações de agendamentos e consultas.
-
-A tela de gestão de pets e a seleção de veterinários exigem perfil `ADMIN`, conforme as regras de segurança da API. Um usuário `VETERINARIO` não recebe privilégios administrativos por estar autenticado.
+O painel mobile desta versão requer perfil **ADMIN**, pois o fluxo principal gerencia pets e consulta veterinários. O aplicativo confirma essa permissão consultando `GET /pet` após o login. O backend também permite ao perfil `VETERINARIO` operar agendamentos e consultas, mas não permite que esse perfil acesse pets ou a lista de veterinários; por isso, o fluxo mobile completo não é liberado para esse perfil.
 
 ### Respostas HATEOAS e paginação
 
@@ -111,7 +107,7 @@ As telas cuidam da apresentação. Hooks encapsulam consultas e mutações com T
 - npm e Git.
 - Android Studio com Android SDK e um emulador configurado, ou aparelho Android.
 - Conta Expo/EAS para gerar o APK.
-- Acesso às credenciais válidas da API Java.
+- Acesso às credenciais válidas de perfil ADMIN da API Java.
 - Acesso ao projeto Firebase para distribuição do APK pelo App Distribution.
 
 ### 1. Clonar e usar a branch de desenvolvimento
@@ -147,11 +143,11 @@ Use a URL raiz, sem acrescentar `/pet`, `/agendamento` ou `/auth/login`. O arqui
 npx expo start -c
 ```
 
-Entre com usuário e senha fornecidos pelo responsável pelo backend. O token JWT é emitido pela API; não cole um token fixo no aplicativo.
+Entre com usuário e senha de perfil ADMIN fornecidos pelo responsável pelo backend. O token JWT é emitido pela API; não cole um token fixo no aplicativo.
 
 ### 5. Validar os fluxos
 
-1. Entrar com usuário autorizado.
+1. Entrar com usuário ADMIN autorizado.
 2. Consultar pacientes.
 3. Criar um pet preenchendo nome, espécie e idade.
 4. Editar e excluir um pet de teste.
@@ -159,7 +155,7 @@ Entre com usuário e senha fornecidos pelo responsável pelo backend. O token JW
 6. Criar um agendamento futuro selecionando pet e veterinário.
 7. Confirmar o registro na lista.
 8. Cancelar um agendamento de teste.
-9. Validar lembrete local em build Android.
+9. Validar lembrete local em build nativo Android.
 10. Conferir o comportamento de logout e sessão expirada.
 
 ## Notificações locais
@@ -200,7 +196,7 @@ A tela Sobre apresenta a versão e o hash de referência do build. Gere o APK a 
 ## Checklist Sprint 4 — Mobile
 
 - [ ] Todas as telas e fluxos validados em Android.
-- [ ] Login JWT validado com credenciais do backend.
+- [ ] Login JWT validado com credenciais ADMIN do backend.
 - [ ] CRUD de pets validado com API real.
 - [ ] Seleção de veterinário e criação de agendamento validadas.
 - [ ] Cancelamento via PATCH validado.
