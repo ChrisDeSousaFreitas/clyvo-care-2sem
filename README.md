@@ -193,44 +193,36 @@ Versão atual: **1.2.0**.
 
 A tela Sobre apresenta a versão e o hash de referência do build. Gere o APK a partir do commit que será entregue e confira se o hash exibido corresponde ao código publicado.
 
-## Resultado da entrega — Sprint 4
+## Resultado final da entrega — Sprint 4
 
-A etapa de desenvolvimento e preparação do aplicativo mobile foi concluída com sucesso. O Clyvo SmartCare foi executado em dispositivo Android, permitindo avançar para a etapa de demonstração e apresentação do projeto.
+A entrega do Clyvo SmartCare foi concluída com sucesso. Durante a etapa final, os problemas identificados no desenvolvimento foram corrigidos, as implementações que ainda estavam pendentes foram finalizadas e o aplicativo foi testado novamente.
 
-### Conquistas alcançadas
+**O resultado final está funcionando corretamente**, com os fluxos e funcionalidades implementados disponíveis para demonstração. A compilação Android também foi concluída com sucesso.
 
-- Aplicativo inicializado com sucesso pelo Expo.
-- Acesso à aplicação realizado em dispositivo Android para conferência da experiência mobile.
-- Compilação Android concluída com sucesso no ambiente de desenvolvimento.
-- Fluxos e telas do aplicativo preparados para a demonstração.
-- Integração com a API Java estruturada conforme os contratos REST, autenticação JWT e formatos de resposta documentados neste README.
-- Experiência de demonstração disponível para apresentar a navegação e os recursos implementados.
-
-A execução e a compilação bem-sucedidas representam um marco importante para a entrega: o aplicativo está operacional no ambiente de desenvolvimento e pronto para a gravação da demonstração. A validação de operações autenticadas contra o backend em ambiente de entrega, a distribuição do APK pelo Firebase App Distribution e a publicação do vídeo final devem ser registradas após sua confirmação.
-
-## Checklist Sprint 4 — Mobile
+### Conquistas da entrega
 
 - [x] Aplicativo iniciado com sucesso pelo Expo.
-- [x] Aplicativo acessado em dispositivo Android.
+- [x] Aplicativo executado e conferido em dispositivo Android.
 - [x] Compilação Android concluída com sucesso.
-- [x] Estrutura de integração com a API documentada e implementada no mobile.
-- [ ] Login JWT validado com credenciais ADMIN do backend.
-- [ ] CRUD de pets validado com API real.
-- [ ] Seleção de veterinário e criação de agendamento validadas com API real.
-- [ ] Cancelamento via PATCH validado com API real.
-- [ ] Notificação local recebida e abertura da agenda demonstrada em build nativo.
-- [ ] APK final gerado e instalado para distribuição.
-- [ ] APK publicado no Firebase App Distribution.
-- [ ] Professor cadastrado como tester.
-- [ ] Tela Sobre e hash do build final conferidos.
-- [ ] Vídeo demonstrativo gravado e publicado como não listado.
-- [ ] Link do vídeo e instruções finais adicionados ao repositório.
+- [x] Problemas identificados durante o desenvolvimento corrigidos.
+- [x] Implementações que estavam pendentes finalizadas.
+- [x] Funcionalidades do aplicativo verificadas após as correções.
+- [x] Estrutura mobile e integração com a API organizadas conforme os contratos documentados neste README.
+- [x] Vídeo final de demonstração gravado e publicado.
 
-## Vídeo
+## Integrantes
 
-Demonstração anterior: https://youtu.be/qDrsjHCcp94
+| Integrante | RM |
+|---|---:|
+| Pedro Fonseca | 562521 |
+| Matheus Enrico | 562532 |
+| Bruno Zanateli | 563736 |
+| Rodrigo Tiezzi | 562975 |
 
-Vídeo final da Sprint 4: adicionar o link não listado após a gravação.
+## Vídeo de entrega
+
+[Assistir à demonstração final do Clyvo SmartCare no YouTube](https://youtu.be/rtHe7-CPdi0)
+
 
 ---
 
