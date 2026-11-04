@@ -1,5 +1,3 @@
-const { expo } = require('./app.json');
-
 module.exports = ({ config }) => ({
   ...config,
   version: '1.1.0',

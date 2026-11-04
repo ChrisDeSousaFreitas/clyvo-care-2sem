@@ -74,7 +74,11 @@ export async function scheduleAppointmentReminder(appointment) {
         appointmentId: appointment.id ? String(appointment.id) : null,
       },
     },
-    trigger: triggerDate,
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      date: triggerDate,
+      channelId: 'appointment-reminders',
+    },
   });
 }
 

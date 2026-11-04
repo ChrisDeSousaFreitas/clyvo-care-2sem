@@ -21,6 +21,13 @@ import AboutScreen from '../screens/AboutScreen';
 const Stack = createNativeStackNavigator();
 const navigationRef = createNavigationContainerRef();
 
+function openAppointmentFromNotification(response) {
+  const destination = response?.notification?.request?.content?.data?.screen;
+  if (destination === 'Agendamentos' && navigationRef.isReady()) {
+    navigationRef.navigate('Agendamentos');
+  }
+}
+
 export default function AppRoutes() {
   const { user, isLoading } = useAuth();
 
@@ -29,12 +36,9 @@ export default function AppRoutes() {
       console.warn('Não foi possível configurar as notificações:', error);
     });
 
-    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
-      const destination = response.notification.request.content.data?.screen;
-      if (destination === 'Agendamentos' && navigationRef.isReady()) {
-        navigationRef.navigate('Agendamentos');
-      }
-    });
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      openAppointmentFromNotification
+    );
 
     return () => subscription.remove();
   }, []);
@@ -48,7 +52,17 @@ export default function AppRoutes() {
   }
 
   return (
-    <NavigationContainer ref={navigationRef}>
+    <NavigationContainer
+      ref={navigationRef}
+      onReady={async () => {
+        try {
+          const lastResponse = await Notifications.getLastNotificationResponseAsync();
+          openAppointmentFromNotification(lastResponse);
+        } catch (error) {
+          console.warn('Não foi possível recuperar a notificação inicial:', error);
+        }
+      }}
+    >
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
           <>
