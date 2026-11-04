@@ -205,6 +205,10 @@ O sistema da **Clyvo Vet** conta agora com um motor de inteligência artificial 
     }
     ```
     
+### Assistente local para demonstração
+
+A tela **Clyvo IA** possui um modo de demonstração independente do endpoint de IA descrito acima. As respostas vêm de uma base de conhecimento local incluída no aplicativo, sem chamadas externas, sem chave de API e sem conexão com o backend. É uma simulação determinística para testar a interface e gravar o fluxo; não é um modelo generativo nem realiza diagnóstico veterinário. Consulte `docs/DEMO-IA-LOCAL.md`.
+
 ## Versão e rastreabilidade
 
 Versão atual: **1.2.0**.

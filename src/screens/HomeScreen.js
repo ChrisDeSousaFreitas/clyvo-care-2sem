@@ -11,7 +11,8 @@ export default function HomeScreen({ navigation }) {
   const shortcuts = [
     { title: 'Pets', description: 'Cadastro e informações', icon: 'paw', route: 'Pets' },
     { title: 'Agenda', description: 'Consultas e procedimentos', icon: 'calendar', route: 'Agendamentos' },
-    { title: 'Smart Collar', description: 'Demonstração da experiência IoT', icon: 'pulse', route: 'Collar', wide: true },
+    { title: 'Smart Collar', description: 'Demonstração da experiência IoT', icon: 'pulse', route: 'Collar' },
+    { title: 'Clyvo IA', description: 'Assistente inteligente do aplicativo', icon: 'sparkles', route: 'Assistant', wide: true },
   ];
 
   return (
@@ -21,6 +22,7 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.eyebrow}>PAINEL CLYVO</Text>
           <Text style={styles.greeting}>Olá, {displayName}.</Text>
           <Text style={styles.subtitle}>Tudo pronto para organizar os cuidados veterinários?</Text>
+          {user?.demoMode && <Text style={styles.demoMode}>MODO DE DEMONSTRAÇÃO</Text>}
         </View>
         <View style={styles.avatar}>
           <Ionicons name="person" size={22} color={colors.secondary} />
@@ -79,6 +81,7 @@ const styles = StyleSheet.create({
   eyebrow: { color: colors.secondary, fontSize: 10, fontWeight: '900', letterSpacing: 1.6, marginBottom: 8 },
   greeting: { fontSize: 29, fontWeight: '900', color: colors.primary },
   subtitle: { fontSize: 14, lineHeight: 21, color: colors.textLight, marginTop: 6, maxWidth: 280 },
+  demoMode: { color: colors.secondary, fontSize: 9, fontWeight: '900', letterSpacing: 1.1, marginTop: 8 },
   avatar: { width: 48, height: 48, borderRadius: 16, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   highlightCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.primary, borderRadius: 20, padding: 18, marginBottom: 30 },
   highlightIcon: { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.secondary, alignItems: 'center', justifyContent: 'center', marginRight: 14 },

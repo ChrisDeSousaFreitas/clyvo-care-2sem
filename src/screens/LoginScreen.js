@@ -12,7 +12,7 @@ export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, loginDemo } = useAuth();
 
   const handleLogin = async () => {
     if (!username.trim() || !password) {
@@ -67,6 +67,16 @@ export default function LoginScreen() {
           )}
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.demoButton}
+          onPress={loginDemo}
+          disabled={loading}
+          accessibilityRole="button"
+        >
+          <Ionicons name="sparkles" size={18} color={colors.secondary} />
+          <Text style={styles.demoButtonText}>Entrar em modo demonstração</Text>
+        </TouchableOpacity>
+
         <View style={styles.securityNote}>
           <Ionicons name="shield-checkmark-outline" size={17} color={colors.secondary} />
           <Text style={styles.securityText}>Autenticação JWT pela API. A sessão é armazenada com segurança no dispositivo.</Text>
@@ -90,6 +100,8 @@ const styles = StyleSheet.create({
   input: { backgroundColor: colors.background, borderWidth: 1, borderColor: '#E1E9EE', paddingHorizontal: 15, paddingVertical: 14, marginBottom: 16, borderRadius: 13, fontSize: 15, color: colors.text },
   button: { backgroundColor: colors.secondary, padding: 16, borderRadius: 13, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 10, marginTop: 5 },
   buttonDisabled: { opacity: 0.7 },
+  demoButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, padding: 14, marginTop: 10, borderRadius: 13, borderWidth: 1, borderColor: '#C9E0E4', backgroundColor: '#F2F8F8' },
+  demoButtonText: { color: colors.secondary, fontSize: 13, fontWeight: '800' },
   buttonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '800' },
   securityNote: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 18 },
   securityText: { flex: 1, color: colors.textLight, fontSize: 10, lineHeight: 15 },

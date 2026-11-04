@@ -84,12 +84,16 @@ export function AuthProvider({ children }) {
     return response.data;
   };
 
+  const loginDemo = () => {
+    setUser({ username: 'Demonstração', role: 'ADMIN', demoMode: true });
+  };
+
   const logout = async () => {
     await clearSession();
     setUser(null);
   };
 
-  const value = useMemo(() => ({ user, isLoading, login, logout }), [user, isLoading]);
+  const value = useMemo(() => ({ user, isLoading, login, loginDemo, logout }), [user, isLoading]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
