@@ -187,6 +187,24 @@ Depois do build:
 6. Envie o APK e distribua o release.
 7. Confirme o recebimento do convite e a instalação.
 
+## 🤖 Módulo de Inteligência Artificial (Sprint 4 - IoT & IA)
+O sistema da **Clyvo Vet** conta agora com um motor de inteligência artificial voltado para o apoio à decisão clínica e triagem preventiva de pets.
+
+### Como funciona:
+1. O tutor ou veterinário envia os dados do pet e os sintomas recentes via API.
+2. O endpoint `/api/ia/analisar-saude` processa as informações e retorna recomendações personalizadas e nível de urgência.
+
+### Endpoints da IA:
+* **POST** `/api/ia/analisar-saude`
+  * *Payload de exemplo:*
+    ```json
+    {
+      "nome": "Thor",
+      "especie": "Cachorro",
+      "sintomas": "Apatia e falta de apetite"
+    }
+    ```
+    
 ## Versão e rastreabilidade
 
 Versão atual: **1.2.0**.
