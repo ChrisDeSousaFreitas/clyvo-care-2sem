@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 
 export default function AboutScreen({ navigation }) {
-  const version = Constants.expoConfig?.version || '1.1.0';
+  const version = Constants.expoConfig?.version || '1.2.0';
   const commitHash =
     Constants.expoConfig?.extra?.commitHash ||
     'Disponível após gerar a versão pelo EAS Build';
