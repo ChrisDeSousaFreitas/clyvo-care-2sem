@@ -1,44 +1,85 @@
-import { useState, useEffect } from 'react';
-import { auth } from '../services/firebaseConfig';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import api from '../api/axiosConfig';
 import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  updateProfile,
-  signOut,
-} from 'firebase/auth';
+  clearSession,
+  getStoredToken,
+  getStoredUsername,
+  saveSession,
+  setUnauthorizedHandler,
+} from '../services/authStorage';
 
-export const useAuth = () => {
+const AuthContext = createContext(null);
+
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setIsLoading(false);
+    let mounted = true;
+
+    const restoreSession = async () => {
+      try {
+        const [token, username] = await Promise.all([
+          getStoredToken(),
+          getStoredUsername(),
+        ]);
+
+        if (mounted && token) {
+          setUser({ username: username || 'Administrador' });
+        }
+      } catch (error) {
+        console.warn('Não foi possível restaurar a sessão:', error);
+        await clearSession();
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    };
+
+    setUnauthorizedHandler(() => {
+      if (mounted) setUser(null);
     });
 
-    return unsubscribe;
+    restoreSession();
+
+    return () => {
+      mounted = false;
+      setUnauthorizedHandler(null);
+    };
   }, []);
 
-  const login = (email, password) =>
-    signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+  const login = async (username, password) => {
+    const response = await api.post('/auth/login', {
+      username: username.trim(),
+      password,
+    });
 
-  const register = async (email, password, displayName) => {
-    const credential = await createUserWithEmailAndPassword(
-      auth,
-      email.trim().toLowerCase(),
-      password
-    );
-
-    if (displayName?.trim()) {
-      await updateProfile(credential.user, { displayName: displayName.trim() });
+    const token = response.data?.token;
+    if (!token) {
+      throw new Error('O backend não retornou o token de autenticação esperado.');
     }
 
-    return credential;
+    await saveSession(token, username.trim());
+    setUser({ username: username.trim() });
+    return response.data;
   };
 
-  const logout = () => signOut(auth);
+  const logout = async () => {
+    await clearSession();
+    setUser(null);
+  };
 
-  return { user, isLoading, login, register, logout };
-};
+  const value = useMemo(
+    () => ({ user, isLoading, login, logout }),
+    [user, isLoading]
+  );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth deve ser utilizado dentro de AuthProvider.');
+  }
+  return context;
+}

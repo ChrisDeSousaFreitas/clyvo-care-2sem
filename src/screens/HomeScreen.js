@@ -6,21 +6,21 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function HomeScreen({ navigation }) {
   const { logout, user } = useAuth();
-  const tutorName = user?.displayName || user?.email?.split('@')[0] || 'Tutor';
+  const displayName = user?.username || 'Administrador';
 
   const shortcuts = [
-    { title: 'Meus Pets', description: 'Perfis e informações', icon: 'paw', route: 'Pets' },
-    { title: 'Agenda', description: 'Consultas e lembretes', icon: 'calendar', route: 'Agendamentos' },
-    { title: 'Smart Collar', description: 'Monitoramento IoT', icon: 'pulse', route: 'Collar', wide: true },
+    { title: 'Pets', description: 'Cadastro e informações', icon: 'paw', route: 'Pets' },
+    { title: 'Agenda', description: 'Consultas e procedimentos', icon: 'calendar', route: 'Agendamentos' },
+    { title: 'Smart Collar', description: 'Demonstração da experiência IoT', icon: 'pulse', route: 'Collar', wide: true },
   ];
 
   return (
     <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.eyebrow}>CUIDADO INTELIGENTE</Text>
-          <Text style={styles.greeting}>Olá, {tutorName}!</Text>
-          <Text style={styles.subtitle}>Como podemos cuidar melhor do seu pet hoje?</Text>
+        <View style={styles.headerCopy}>
+          <Text style={styles.eyebrow}>PAINEL CLYVO</Text>
+          <Text style={styles.greeting}>Olá, {displayName}.</Text>
+          <Text style={styles.subtitle}>Tudo pronto para organizar os cuidados veterinários?</Text>
         </View>
         <View style={styles.avatar}>
           <Ionicons name="person" size={22} color={colors.secondary} />
@@ -32,12 +32,12 @@ export default function HomeScreen({ navigation }) {
           <Ionicons name="heart" size={23} color="#FFFFFF" />
         </View>
         <View style={styles.highlightCopy}>
-          <Text style={styles.highlightTitle}>Bem-estar em primeiro lugar</Text>
-          <Text style={styles.highlightText}>Acompanhe informações e mantenha os cuidados organizados.</Text>
+          <Text style={styles.highlightTitle}>Cuidado em cada detalhe</Text>
+          <Text style={styles.highlightText}>Gerencie os pacientes, acompanhe consultas e mantenha a rotina clínica organizada.</Text>
         </View>
       </View>
 
-      <Text style={styles.sectionTitle}>Seu espaço</Text>
+      <Text style={styles.sectionTitle}>Acesso rápido</Text>
       <View style={styles.grid}>
         {shortcuts.map((item) => (
           <TouchableOpacity
@@ -65,7 +65,7 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
           <Ionicons name="log-out-outline" size={19} color={colors.danger} />
-          <Text style={styles.logoutText}>Sair</Text>
+          <Text style={styles.logoutText}>Sair da conta</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -75,9 +75,10 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flexGrow: 1, padding: 24, paddingTop: 62, paddingBottom: 30, backgroundColor: colors.background },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 26 },
+  headerCopy: { flex: 1, paddingRight: 12 },
   eyebrow: { color: colors.secondary, fontSize: 10, fontWeight: '900', letterSpacing: 1.6, marginBottom: 8 },
   greeting: { fontSize: 29, fontWeight: '900', color: colors.primary },
-  subtitle: { fontSize: 14, lineHeight: 21, color: colors.textLight, marginTop: 6, maxWidth: 260 },
+  subtitle: { fontSize: 14, lineHeight: 21, color: colors.textLight, marginTop: 6, maxWidth: 280 },
   avatar: { width: 48, height: 48, borderRadius: 16, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   highlightCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.primary, borderRadius: 20, padding: 18, marginBottom: 30 },
   highlightIcon: { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.secondary, alignItems: 'center', justifyContent: 'center', marginRight: 14 },

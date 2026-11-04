@@ -10,7 +10,6 @@ import { useAuth } from '../hooks/useAuth';
 import { configureNotifications } from '../services/notifications';
 
 import LoginScreen from '../screens/LoginScreen';
-import CadastroScreen from '../screens/CadastroScreen';
 import HomeScreen from '../screens/HomeScreen';
 import PetsListScreen from '../screens/PetsListScreen';
 import AgendamentoScreen from '../screens/AgendamentoScreen';
@@ -74,10 +73,7 @@ export default function AppRoutes() {
             <Stack.Screen name="About" component={AboutScreen} />
           </>
         ) : (
-          <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Cadastro" component={CadastroScreen} />
-          </>
+          <Stack.Screen name="Login" component={LoginScreen} />
         )}
       </Stack.Navigator>
     </NavigationContainer>

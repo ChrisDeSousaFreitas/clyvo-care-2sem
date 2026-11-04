@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '../api/axiosConfig';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import api, { extractCollection } from '../api/axiosConfig';
 
 export const useAgendamentos = () => {
   const queryClient = useQueryClient();
@@ -7,37 +7,22 @@ export const useAgendamentos = () => {
   const query = useQuery({
     queryKey: ['agendamentos'],
     queryFn: async () => {
-      const response = await api.get('/agendamentos');
-      return response.data;
-    }
+      const response = await api.get('/agendamento', {
+        params: { page: 0, size: 100, sort: 'dataHora,asc' },
+      });
+      return extractCollection(response.data);
+    },
   });
 
   const createMutation = useMutation({
-    mutationFn: async (novoAgendamento) => await api.post('/agendamentos', novoAgendamento),
+    mutationFn: (newAppointment) => api.post('/agendamento', newAppointment),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['agendamentos'] }),
-    onError: (error) => {
-      console.error("ERRO AO CRIAR AGENDAMENTO:", error);
-      alert('Erro na API: Não foi possível salvar o agendamento. Verifique seu backend.');
-    }
   });
 
-  const updateMutation = useMutation({
-    mutationFn: async ({ id, ...agendamentoData }) => await api.put(`/agendamentos/${id}`, agendamentoData),
+  const cancelMutation = useMutation({
+    mutationFn: (appointmentId) => api.patch(`/agendamento/${appointmentId}/cancelar`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['agendamentos'] }),
-    onError: (error) => {
-      console.error("ERRO AO ATUALIZAR AGENDAMENTO:", error);
-      alert('Erro na API: Não foi possível editar o agendamento. Verifique seu backend.');
-    }
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (agendamentoId) => await api.delete(`/agendamentos/${agendamentoId}`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['agendamentos'] }),
-    onError: (error) => {
-      console.error("ERRO AO EXCLUIR AGENDAMENTO:", error);
-      alert('Erro na API: Não foi possível excluir o agendamento.');
-    }
-  });
-
-  return { query, createMutation, updateMutation, deleteMutation };
+  return { query, createMutation, cancelMutation };
 };

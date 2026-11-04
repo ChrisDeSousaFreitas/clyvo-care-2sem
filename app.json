@@ -2,7 +2,7 @@
   "expo": {
     "name": "Clyvo SmartCare",
     "slug": "clyvo-care-2sem",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "clyvocare2sem",

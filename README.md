@@ -1,30 +1,88 @@
 # 🐾 Clyvo SmartCare
 
-Aplicativo mobile para apoiar tutores no acompanhamento da saúde dos pets, reunindo cadastro, organização de cuidados, histórico de agendamentos e uma experiência de monitoramento Smart Collar.
+Aplicativo mobile de apoio à gestão clínica veterinária. O Clyvo conecta a experiência mobile à API Java/Spring Boot do projeto, permitindo autenticação, cadastro de pacientes, consulta de veterinários e organização de agendamentos.
 
-## Visão geral
+## Evolução da integração mobile + backend
 
-O Clyvo SmartCare foi desenvolvido em React Native com Expo. A aplicação possui autenticação Firebase, telas de gestão de pets, agenda de cuidados e uma área de demonstração da coleira inteligente.
+Na versão **1.2.0**, o aplicativo foi adaptado aos contratos existentes da API Java. Em vez de alterar o backend para acomodar rotas e payloads do mobile, o front-end passou a respeitar os endpoints, DTOs, validações, autenticação JWT, permissões e respostas HATEOAS já definidos pelo servidor.
 
-### Funcionalidades
+### Contratos utilizados
 
-- Cadastro e login de tutores com Firebase Authentication.
-- Cadastro, consulta, edição e exclusão de pets por meio da API REST.
-- Agenda de consultas e procedimentos.
-- Lembretes locais para agendamentos futuros.
-- Tela de perfil do pet.
-- Área Smart Collar para visualização do conceito de telemetria.
-- Tema claro/escuro baseado na preferência do sistema.
-- Tela **Sobre o App**, com versão e hash do commit usado no build.
+| Recurso | Contrato da API |
+|---|---|
+| Autenticação | `POST /auth/login` com `username` e `password` |
+| Pets | `/pet` (singular), CRUD REST |
+| Veterinários | `GET /veterinario` |
+| Agendamentos | `/agendamento` (singular) |
+| Cancelamento | `PATCH /agendamento/{id}/cancelar` |
 
-> **Importante:** o Smart Collar disponível nesta versão é uma demonstração de interface. A telemetria real depende da integração IoT/backend correspondente. Os dados de saúde que ainda não vêm de uma fonte real não devem ser apresentados como medições clínicas.
+### Payload de pet
+
+A API exige nome com 3 a 50 caracteres, espécie e idade (inteiro maior ou igual a zero). Raça, cor e peso são opcionais; quando informado, o peso precisa ser maior que zero.
+
+```json
+{
+  "nome": "Luna",
+  "especie": "Cachorro",
+  "raca": "Golden Retriever",
+  "cor": "Dourado",
+  "idade": 3,
+  "peso": 24.5
+}
+```
+
+### Payload de agendamento
+
+A API exige data/hora futura, ID de um pet existente e ID de um veterinário existente. O status é definido pelo backend como `AGENDADO`.
+
+```json
+{
+  "dataHora": "2026-11-10T14:30:00",
+  "idPet": 1,
+  "idVeterinario": 1,
+  "motivo": "Consulta de rotina"
+}
+```
+
+A API usa os estados `AGENDADO`, `REALIZADO` e `CANCELADO`. O aplicativo cancela pelo endpoint de ação disponibilizado pelo servidor; não envia DELETE para agendamentos.
+
+### Autenticação e permissões
+
+O aplicativo autentica na API com `/auth/login`, recebe o token JWT e o guarda com `expo-secure-store` (Android Keystore / iOS Keychain). O token é enviado automaticamente no cabeçalho `Authorization: Bearer`. Uma resposta HTTP 401 encerra a sessão local para solicitar novo login.
+
+**Não inclua tokens, senhas ou credenciais no código, no README, em variáveis `EXPO_PUBLIC_*` ou no GitHub.** O login usa as credenciais fornecidas pelo responsável pelo backend.
+
+A configuração atual do backend autoriza:
+- `ADMIN`: operações de tutores, pets, veterinários, agendamentos e consultas.
+- `VETERINARIO`: operações de agendamentos e consultas.
+
+A tela de gestão de pets e a seleção de veterinários exigem perfil `ADMIN`, conforme as regras de segurança da API. Um usuário `VETERINARIO` não recebe privilégios administrativos por estar autenticado.
+
+### Respostas HATEOAS e paginação
+
+Listagens do Spring retornam modelos paginados com dados em `_embedded`, além de metadados e links. O mobile normaliza a coleção embutida e solicita até 100 registros por página na primeira versão. Para bases maiores, implemente paginação incremental.
+
+## Funcionalidades mobile
+
+- Login integrado ao JWT da API Java.
+- Persistência segura da sessão no dispositivo.
+- Cadastro, consulta, edição e exclusão de pets conforme o DTO Java.
+- Consulta de veterinários para seleção no agendamento.
+- Criação e listagem de agendamentos.
+- Cancelamento de agendamento via PATCH.
+- Lembretes locais de consultas futuras.
+- Ficha cadastral do pet.
+- Smart Collar em modo de simulação; não representa telemetria real.
+- Tela Sobre o App com versão e hash do build.
 
 ## Tecnologias
 
-- React Native 0.86
-- Expo SDK 57
+- React Native
+- Expo SDK 58
 - React Navigation
-- Firebase Authentication
+- Spring Boot REST API
+- JWT Bearer Authentication
+- Expo SecureStore
 - TanStack Query
 - Axios
 - Expo Notifications
@@ -34,35 +92,35 @@ O Clyvo SmartCare foi desenvolvido em React Native com Expo. A aplicação possu
 
 ```text
 src/
-├── api/          # configuração e cliente HTTP
+├── api/          # Axios, JWT e normalização HATEOAS
 ├── components/   # componentes reutilizáveis
 ├── hooks/        # autenticação e operações de dados
 ├── routes/       # navegação
 ├── screens/      # telas da aplicação
-├── services/     # Firebase e notificações
+├── services/     # armazenamento seguro e notificações
 └── theme/        # identidade visual e cores
 ```
 
-As telas ficam responsáveis pela apresentação e interação. Hooks concentram o acesso aos dados via TanStack Query, enquanto os serviços isolam integrações externas, como Firebase e notificações locais.
+As telas cuidam da apresentação. Hooks encapsulam consultas e mutações com TanStack Query. O cliente Axios centraliza URL, autenticação e tratamento de erros. O serviço de sessão usa SecureStore para persistir o JWT.
 
 ## Configuração do ambiente
 
 ### Pré-requisitos
 
-- Node.js LTS compatível com Expo SDK 57 (Node 22.13 ou superior).
-- npm.
-- Git.
-- Expo Go para testar a interface e funcionalidades compatíveis.
-- Android Studio/emulador ou um aparelho Android para validar a versão nativa.
+- Node.js 22.13.x ou superior.
+- npm e Git.
+- Android Studio com Android SDK e um emulador configurado, ou aparelho Android.
 - Conta Expo/EAS para gerar o APK.
-- Acesso ao projeto Firebase para distribuir o aplicativo.
+- Acesso às credenciais válidas da API Java.
+- Acesso ao projeto Firebase para distribuição do APK pelo App Distribution.
 
-### 1. Clonar o repositório
+### 1. Clonar e usar a branch de desenvolvimento
 
 ```bash
 git clone https://github.com/ChrisDeSousaFreitas/clyvo-care-2sem.git
 cd clyvo-care-2sem
 git checkout develop
+git pull origin develop
 ```
 
 ### 2. Instalar dependências
@@ -70,21 +128,18 @@ git checkout develop
 ```bash
 npm install
 npx expo install --fix
+npx expo-doctor
 ```
 
-### 3. Configurar a API backend
+### 3. Configurar a URL da API
 
-Copie `.env.example` para `.env` e substitua o valor de `EXPO_PUBLIC_API_URL` pela URL pública real do backend Java.
-
-Exemplo:
+Copie `.env.example` para `.env` e confirme a URL base do backend:
 
 ```env
-EXPO_PUBLIC_API_URL=https://seu-backend-publicado
+EXPO_PUBLIC_API_URL=https://java-challenge-fiap-2026.onrender.com
 ```
 
-A API deve disponibilizar os endpoints usados pela aplicação, incluindo `/pets` e `/agendamentos`. **Não use a URL do repositório GitHub como URL da API.** Sem essa configuração, as operações de dados serão interrompidas com uma mensagem explícita.
-
-O arquivo `.env` é local e não deve ser enviado ao Git.
+Use a URL raiz, sem acrescentar `/pet`, `/agendamento` ou `/auth/login`. O arquivo `.env` é local e não deve ser enviado ao Git.
 
 ### 4. Iniciar o aplicativo
 
@@ -92,59 +147,77 @@ O arquivo `.env` é local e não deve ser enviado ao Git.
 npx expo start -c
 ```
 
-Escaneie o QR Code com o Expo Go para validar as telas compatíveis. Para validar notificações e a versão final distribuída, gere e teste um build nativo.
+Entre com usuário e senha fornecidos pelo responsável pelo backend. O token JWT é emitido pela API; não cole um token fixo no aplicativo.
+
+### 5. Validar os fluxos
+
+1. Entrar com usuário autorizado.
+2. Consultar pacientes.
+3. Criar um pet preenchendo nome, espécie e idade.
+4. Editar e excluir um pet de teste.
+5. Consultar a lista de veterinários.
+6. Criar um agendamento futuro selecionando pet e veterinário.
+7. Confirmar o registro na lista.
+8. Cancelar um agendamento de teste.
+9. Validar lembrete local em build Android.
+10. Conferir o comportamento de logout e sessão expirada.
 
 ## Notificações locais
 
-Ao salvar um agendamento com data futura, o aplicativo solicita permissão e programa um lembrete relacionado à consulta. O aviso é programado para 30 minutos antes; se o horário estiver a menos de 30 minutos, o lembrete ocorre no horário do agendamento. Ao tocar na notificação, o aplicativo abre a agenda.
+Ao salvar um agendamento futuro, o aplicativo solicita permissão e programa um lembrete para 30 minutos antes. Se faltarem menos de 30 minutos, o aviso é programado para o horário do compromisso. O lembrete é local no dispositivo e não substitui notificações remotas enviadas pelo servidor.
 
-Formato obrigatório da data no formulário:
+Formato aceito no formulário: `AAAA-MM-DD HH:mm`. O aplicativo converte para o formato ISO LocalDateTime esperado pelo backend.
 
-```text
-AAAA-MM-DD HH:mm
-Exemplo: 2026-11-10 14:30
+## Build Android e Firebase App Distribution
+
+O perfil `preview` em `eas.json` gera um APK instalável.
+
+```bash
+npm install -g eas-cli
+eas login
+eas init
+eas build:configure
+eas build --platform android --profile preview
 ```
 
-A permissão precisa ser concedida no aparelho. A funcionalidade deve ser validada em build nativo e demonstrada no vídeo.
+Configure o `projectId` retornado pelo EAS em `app.config.js` dentro de `extra.eas`. Confirme o applicationId Android no Firebase Console antes de gerar a versão de distribuição.
 
-## Build Android para distribuição
+Depois do build:
+1. Baixe o APK gerado.
+2. Instale e valide em um Android.
+3. Abra o Firebase Console e selecione o projeto Clyvo.
+4. Acesse App Distribution.
+5. Cadastre o e-mail institucional do professor como tester.
+6. Envie o APK e distribua o release.
+7. Confirme o recebimento do convite e a instalação.
 
-O arquivo `eas.json` contém o perfil `preview`, configurado para gerar APK instalável.
+## Versão e rastreabilidade
 
-1. Instale/atualize a CLI: `npm install -g eas-cli`.
-2. Entre na conta: `eas login`.
-3. Configure o projeto EAS: `eas build:configure`.
-4. Gere o APK: `eas build --platform android --profile preview`.
-5. Baixe o APK gerado e valide a instalação em um aparelho Android.
-6. Envie o APK para o Firebase App Distribution e cadastre o e-mail institucional do professor como tester.
+Versão atual: **1.2.0**.
 
-O identificador Android do aplicativo precisa corresponder ao aplicativo Android cadastrado no Firebase. Confirme esse identificador no console Firebase antes do primeiro build.
+A tela Sobre apresenta a versão e o hash de referência do build. Gere o APK a partir do commit que será entregue e confira se o hash exibido corresponde ao código publicado.
 
-## Publicação e rastreabilidade
+## Checklist Sprint 4 — Mobile
 
-A tela **Sobre o App** mostra a versão e o hash de referência informado pelo EAS Build. Para a avaliação, publique o APK gerado a partir do mesmo commit que será entregue no GitHub e confirme que o hash exibido na tela corresponde ao commit publicado.
-
-Versão atual do projeto: **1.1.0**.
-
-## Entrega da Sprint 4 — checklist
-
-- [ ] Todas as telas e fluxos testados em aparelho/emulador.
-- [ ] API backend configurada e CRUD validado.
-- [ ] Lembrete local recebido e abertura da agenda validada.
-- [ ] Build APK gerado e instalado.
+- [ ] Todas as telas e fluxos validados em Android.
+- [ ] Login JWT validado com credenciais do backend.
+- [ ] CRUD de pets validado com API real.
+- [ ] Seleção de veterinário e criação de agendamento validadas.
+- [ ] Cancelamento via PATCH validado.
+- [ ] Notificação local recebida e abertura da agenda demonstrada.
+- [ ] APK gerado e instalado.
 - [ ] APK publicado no Firebase App Distribution.
-- [ ] E-mail institucional do professor cadastrado como tester.
-- [ ] Tela Sobre o App validada com o hash do build.
-- [ ] Vídeo contínuo gravado, mostrando fluxos reais, notificações e a versão publicada.
-- [ ] README revisado e links finais adicionados.
-- [ ] Entrega realizada pelo repositório oficial do GitHub Classroom, conforme orientação da disciplina.
+- [ ] Professor cadastrado como tester.
+- [ ] Tela Sobre e hash do build conferidos.
+- [ ] Vídeo demonstrativo gravado e publicado como não listado.
+- [ ] Link do vídeo e instruções finais adicionados ao repositório.
 
 ## Vídeo
 
-Vídeo demonstrativo anterior: https://youtu.be/qDrsjHCcp94
+Demonstração anterior: https://youtu.be/qDrsjHCcp94
 
-**Vídeo da entrega final da Sprint 4:** adicionar aqui o link não listado após a gravação.
+Vídeo final da Sprint 4: adicionar o link não listado após a gravação.
 
-## Identidade do projeto
+---
 
 **Clyvo SmartCare** — cuidado conectado para pets.
