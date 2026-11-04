@@ -1,195 +1,219 @@
 # 🐾 Clyvo SmartCare
 
-> Aplicativo móvel para monitoramento avançado da saúde de pets, integrando gestão de dados clínicos com telemetria simulada via IoT (Internet das Coisas).
+Aplicativo mobile de apoio à gestão clínica veterinária. O Clyvo conecta a experiência mobile à API Java/Spring Boot do projeto, permitindo autenticação, cadastro de pacientes, consulta de veterinários e organização de agendamentos.
 
-O **Clyvo SmartCare** é um aplicativo móvel voltado para o monitoramento avançado da saúde de pets, integrando gestão de dados clínicos com telemetria simulada via IoT (Internet das Coisas).
+## Evolução da integração mobile + backend
 
-O objetivo do projeto é oferecer aos tutores uma ferramenta robusta, com design premium e intuitivo, garantindo total controle sobre o bem-estar de seus animais — sejam eles **cães, gatos ou exóticos**.
+Na versão **1.2.0**, o aplicativo foi adaptado aos contratos existentes da API Java. Em vez de alterar o backend para acomodar rotas e payloads do mobile, o front-end passou a respeitar os endpoints, DTOs, validações, autenticação JWT, permissões e respostas HATEOAS já definidos pelo servidor.
 
----
+### Contratos utilizados
 
-## 👥 Integrantes
+| Recurso | Contrato da API |
+|---|---|
+| Autenticação | `POST /auth/login` com `username` e `password` |
+| Pets | `/pet` (singular), CRUD REST |
+| Veterinários | `GET /veterinario` |
+| Agendamentos | `/agendamento` (singular) |
+| Cancelamento | `PATCH /agendamento/{id}/cancelar` |
 
-| **Integrante**         | **RM** |
-| ---------------------- | -----: |
-| Bruno Andrade Zanateli | 563736 |
-| Christian S. Freitas   | 566098 |
-| Pedro Pereira Biasolli | 562521 |
-| Rodrigo Tiezzi         | 562975 |
-| Matheus Enrico Souza   | 562532 |
+### Payload de pet
 
----
+A API exige nome com 3 a 50 caracteres, espécie e idade (inteiro maior ou igual a zero). Raça, cor e peso são opcionais; quando informado, o peso precisa ser maior que zero.
 
-## 🛠️ Tecnologias e Arquitetura
-
-O projeto foi construído utilizando um ecossistema moderno para garantir **performance e escalabilidade**.
-
-* **Framework Principal:** React Native com Expo (SDK 56+).
-* **Navegação:** React Navigation (Stack puro).
-* **Animações:** React Native Reanimated.
-* **Estilização e UI:** Componentização customizada com suporte nativo a Dark Mode.
-* **Integrações (Em andamento):** Firebase para Autenticação e TanStack Query para consumo da API.
-
----
-
-# 🛤️ A Jornada de Desenvolvimento
-
-O desenvolvimento do Clyvo SmartCare passou por fases intensas de reestruturação arquitetural e refinamento visual.
-
-Abaixo, detalhamos os obstáculos enfrentados e as vitórias alcançadas.
-
----
-
-## 🐛 Os Desafios e Erros (Troubleshooting)
-
-### 1. O Conflito de Rotas e Tipagens
-
-No início, o projeto utilizava o `expo-router`, mas a estrutura automática gerou conflitos severos de ambiente, quebrando a compilação com erros de arquivos ausentes (como `expo-env.d.ts` e `tsconfig.base`).
-
-#### ✅ A Solução
-
-Foi necessário realizar uma limpeza profunda:
-
-* Deletando `node_modules`;
-* Limpando o cache do empacotador;
-* Removendo o `expo-router`;
-* Convertendo a configuração rígida do TypeScript para um `jsconfig.json` mais flexível.
-
-Assumimos o controle manual das rotas migrando para o **React Navigation puro**.
-
----
-
-### 2. Perda de Dependências Visuais
-
-Durante a limpeza arquitetural, o módulo de ícones (`@expo/vector-icons`) foi perdido, gerando quebras instantâneas na renderização da interface.
-
-#### ✅ A Solução
-
-Foi realizada a reinstalação direcionada do pacote e a reinicialização forçada do Metro Bundler para remapear os componentes.
-
----
-
-### 3. Falhas de Navegação no Roteamento
-
-Enfrentamos a exceção:
-
-```text
-"The action 'GO_BACK' was not handled"
+```json
+{
+  "nome": "Luna",
+  "especie": "Cachorro",
+  "raca": "Golden Retriever",
+  "cor": "Dourado",
+  "idade": 3,
+  "peso": 24.5
+}
 ```
 
-O aplicativo abria a tela de Cadastro primeiro e impedia o usuário de retornar ao Login.
+### Payload de agendamento
 
-#### ✅ A Solução
+A API exige data/hora futura, ID de um pet existente e ID de um veterinário existente. O status é definido pelo backend como `AGENDADO`.
 
-Refatoração do arquivo `AppRoutes.js` para:
+```json
+{
+  "dataHora": "2026-11-10T14:30:00",
+  "idPet": 1,
+  "idVeterinario": 1,
+  "motivo": "Consulta de rotina"
+}
+```
 
-* Forçar o `initialRouteName` no Login;
-* Substituir comandos relativos de voltar (`goBack`) por rotas absolutas (`navigate('Login')`);
-* Blindar a navegação.
+A API usa os estados `AGENDADO`, `REALIZADO` e `CANCELADO`. O aplicativo cancela pelo endpoint de ação disponibilizado pelo servidor; não envia DELETE para agendamentos.
 
----
+### Autenticação e permissões
 
-# 🎨 Os Acertos e a Evolução da Interface
+O aplicativo autentica na API com `/auth/login`, recebe o token JWT e o guarda com `expo-secure-store` (Android Keystore / iOS Keychain). O token é enviado automaticamente no cabeçalho `Authorization: Bearer`. Uma resposta HTTP 401 encerra a sessão local para solicitar novo login.
 
-Com a base estrutural estabilizada, o foco virou **100% para a Experiência do Usuário (UX) e Interface (UI)**.
+**Não inclua tokens, senhas ou credenciais no código, no README, em variáveis `EXPO_PUBLIC_*` ou no GitHub.** O login usa as credenciais fornecidas pelo responsável pelo backend.
 
-O aplicativo foi moldado seguindo a identidade visual oficial da marca:
+O painel mobile desta versão requer perfil **ADMIN**, pois o fluxo principal gerencia pets e consulta veterinários. O aplicativo confirma essa permissão consultando `GET /pet` após o login. O backend também permite ao perfil `VETERINARIO` operar agendamentos e consultas, mas não permite que esse perfil acesse pets ou a lista de veterinários; por isso, o fluxo mobile completo não é liberado para esse perfil.
 
-* 🔵 **Azul Marinho:** primária;
-* 🟢 **Verde-Água/Teal:** secundária;
-* 🟠 **Laranja:** acentuação.
+### Respostas HATEOAS e paginação
 
----
+Listagens do Spring retornam modelos paginados com dados em `_embedded`, além de metadados e links. O mobile normaliza a coleção embutida e solicita até 100 registros por página na primeira versão. Para bases maiores, implemente paginação incremental.
 
-## 🔐 Diferenciação Crítica de Telas
+## Funcionalidades mobile
 
-Para evitar penalizações acadêmicas por **"telas duplicadas"**, a tela de Login ganhou um formato moderno em **Bottom Sheet** (cartão flutuante sobre fundo escuro), enquanto o Cadastro foi transformado em uma tela clara e expansiva de **Onboarding**, provando domínio sobre layouts complexos.
+- Login integrado ao JWT da API Java.
+- Persistência segura da sessão no dispositivo.
+- Cadastro, consulta, edição e exclusão de pets conforme o DTO Java.
+- Consulta de veterinários para seleção no agendamento.
+- Criação e listagem de agendamentos.
+- Cancelamento de agendamento via PATCH.
+- Lembretes locais de consultas futuras.
+- Ficha cadastral do pet.
+- Smart Collar em modo de simulação; não representa telemetria real.
+- Tela Sobre o App com versão e hash do build.
 
----
+## Tecnologias
 
-## 🐶 Seletor Visual de Espécies
+- React Native
+- Expo SDK 58
+- React Navigation
+- Spring Boot REST API
+- JWT Bearer Authentication
+- Expo SecureStore
+- TanStack Query
+- Axios
+- Expo Notifications
+- React Native Reanimated
 
-Remoção de campos de digitação cansativos para a escolha da espécie do pet, substituídos por **botões interativos com ícones vetoriais**.
+## Arquitetura
 
----
+```text
+src/
+├── api/          # Axios, JWT e normalização HATEOAS
+├── components/   # componentes reutilizáveis
+├── hooks/        # autenticação e operações de dados
+├── routes/       # navegação
+├── screens/      # telas da aplicação
+├── services/     # armazenamento seguro e notificações
+└── theme/        # identidade visual e cores
+```
 
-# ✨ Funcionalidades em Destaque
+As telas cuidam da apresentação. Hooks encapsulam consultas e mutações com TanStack Query. O cliente Axios centraliza URL, autenticação e tratamento de erros. O serviço de sessão usa SecureStore para persistir o JWT.
 
-A aplicação foi enriquecida com mecânicas visuais que normalmente são vistas apenas em aplicativos de **altíssimo padrão no mercado**.
+## Configuração do ambiente
 
----
+### Pré-requisitos
 
-## 💀 Efeito Skeleton Loading
+- Node.js 22.13.x ou superior.
+- npm e Git.
+- Android Studio com Android SDK e um emulador configurado, ou aparelho Android.
+- Conta Expo/EAS para gerar o APK.
+- Acesso às credenciais válidas de perfil ADMIN da API Java.
+- Acesso ao projeto Firebase para distribuição do APK pelo App Distribution.
 
-Em vez da tradicional e monótona "bolinha girando", implementamos blocos cinzas animados que pulsam enquanto os dados dos pets carregam, elevando a percepção de velocidade do app.
+### 1. Clonar e usar a branch de desenvolvimento
 
----
+```bash
+git clone https://github.com/ChrisDeSousaFreitas/clyvo-care-2sem.git
+cd clyvo-care-2sem
+git checkout develop
+git pull origin develop
+```
 
-## 🩺 Timeline Médica Vertical
-
-A tela de agendamentos foi construída como uma **linha do tempo contínua**, conectando consultas concluídas e pendentes por nós e linhas, facilitando a leitura do histórico clínico.
-
----
-
-## 🐾 Simulador IoT (Smart Collar)
-
-O módulo de coleira inteligente possui uma **animação nativa de pulsação (batimentos cardíacos)**.
-
-Inserimos um botão interativo que simula um **pico de estresse**, acelerando a animação imediatamente e trocando a interface para vermelho de alerta.
-
----
-
-## 🌙 Dark Mode Dinâmico
-
-A paleta de cores inteira foi reescrita com o suporte da API `Appearance`.
-
-O aplicativo lê a preferência do sistema operacional do usuário e transita suavemente entre o **modo claro** e o **modo escuro** sem quebrar o contraste da identidade visual.
-
----
-
-# 🎥 Vídeo de Apresentação
-
-> **Vídeo demonstrativo do projeto — requisito da entrega**
-
-🔗 **Link do vídeo no YouTube:**
-**[https://youtu.be/qDrsjHCcp94]**
-
----
-
-# 🚀 Como Executar o Projeto
-
-## 1. Clone o repositório
-
-Clone o repositório e acesse a pasta raiz.
-
----
-
-## 2. Instale as dependências
-
-Execute:
+### 2. Instalar dependências
 
 ```bash
 npm install
+npx expo install --fix
+npx expo-doctor
 ```
 
----
+### 3. Configurar a URL da API
 
-## 3. Inicie o servidor do Expo
+Copie `.env.example` para `.env` e confirme a URL base do backend:
 
-Inicie o servidor do Expo limpando o cache para garantir que todas as configurações de rotas e cores sejam lidas corretamente:
+```env
+EXPO_PUBLIC_API_URL=https://java-challenge-fiap-2026.onrender.com
+```
+
+Use a URL raiz, sem acrescentar `/pet`, `/agendamento` ou `/auth/login`. O arquivo `.env` é local e não deve ser enviado ao Git.
+
+### 4. Iniciar o aplicativo
 
 ```bash
 npx expo start -c
 ```
 
+Entre com usuário e senha de perfil ADMIN fornecidos pelo responsável pelo backend. O token JWT é emitido pela API; não cole um token fixo no aplicativo.
+
+### 5. Validar os fluxos
+
+1. Entrar com usuário ADMIN autorizado.
+2. Consultar pacientes.
+3. Criar um pet preenchendo nome, espécie e idade.
+4. Editar e excluir um pet de teste.
+5. Consultar a lista de veterinários.
+6. Criar um agendamento futuro selecionando pet e veterinário.
+7. Confirmar o registro na lista.
+8. Cancelar um agendamento de teste.
+9. Validar lembrete local em build nativo Android.
+10. Conferir o comportamento de logout e sessão expirada.
+
+## Notificações locais
+
+Ao salvar um agendamento futuro, o aplicativo solicita permissão e programa um lembrete para 30 minutos antes. Se faltarem menos de 30 minutos, o aviso é programado para o horário do compromisso. O lembrete é local no dispositivo e não substitui notificações remotas enviadas pelo servidor.
+
+Formato aceito no formulário: `AAAA-MM-DD HH:mm`. O aplicativo converte para o formato ISO LocalDateTime esperado pelo backend.
+
+## Build Android e Firebase App Distribution
+
+O perfil `preview` em `eas.json` gera um APK instalável.
+
+```bash
+npm install -g eas-cli
+eas login
+eas init
+eas build:configure
+eas build --platform android --profile preview
+```
+
+Configure o `projectId` retornado pelo EAS em `app.config.js` dentro de `extra.eas`. Confirme o applicationId Android no Firebase Console antes de gerar a versão de distribuição.
+
+Depois do build:
+1. Baixe o APK gerado.
+2. Instale e valide em um Android.
+3. Abra o Firebase Console e selecione o projeto Clyvo.
+4. Acesse App Distribution.
+5. Cadastre o e-mail institucional do professor como tester.
+6. Envie o APK e distribua o release.
+7. Confirme o recebimento do convite e a instalação.
+
+## Versão e rastreabilidade
+
+Versão atual: **1.2.0**.
+
+A tela Sobre apresenta a versão e o hash de referência do build. Gere o APK a partir do commit que será entregue e confira se o hash exibido corresponde ao código publicado.
+
+## Checklist Sprint 4 — Mobile
+
+- [ ] Todas as telas e fluxos validados em Android.
+- [ ] Login JWT validado com credenciais ADMIN do backend.
+- [ ] CRUD de pets validado com API real.
+- [ ] Seleção de veterinário e criação de agendamento validadas.
+- [ ] Cancelamento via PATCH validado.
+- [ ] Notificação local recebida e abertura da agenda demonstrada.
+- [ ] APK gerado e instalado.
+- [ ] APK publicado no Firebase App Distribution.
+- [ ] Professor cadastrado como tester.
+- [ ] Tela Sobre e hash do build conferidos.
+- [ ] Vídeo demonstrativo gravado e publicado como não listado.
+- [ ] Link do vídeo e instruções finais adicionados ao repositório.
+
+## Vídeo
+
+Demonstração anterior: https://youtu.be/qDrsjHCcp94
+
+Vídeo final da Sprint 4: adicionar o link não listado após a gravação.
+
 ---
 
-## 4. Execute no seu celular
-
-Escaneie o **QR Code** gerado no terminal usando o aplicativo **Expo Go** no seu celular físico.
-
----
-
-# 🐾 Clyvo SmartCare
-
-O **Clyvo SmartCare** busca oferecer aos tutores uma ferramenta robusta, premium e intuitiva para o acompanhamento do bem-estar de seus animais, integrando **gestão clínica**, **telemetria simulada via IoT**, **animações**, **UX moderna** e **Dark Mode dinâmico** em uma única aplicação.
+**Clyvo SmartCare** — cuidado conectado para pets.

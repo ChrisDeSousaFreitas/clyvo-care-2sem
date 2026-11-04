@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '../api/axiosConfig';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import api, { extractCollection } from '../api/axiosConfig';
 
 export const usePets = () => {
   const queryClient = useQueryClient();
@@ -7,36 +7,26 @@ export const usePets = () => {
   const query = useQuery({
     queryKey: ['pets'],
     queryFn: async () => {
-      const response = await api.get('/pets');
-      return response.data;
-    }
+      const response = await api.get('/pet', {
+        params: { page: 0, size: 100, sort: 'nome,asc' },
+      });
+      return extractCollection(response.data);
+    },
   });
 
   const createMutation = useMutation({
-    mutationFn: async (newPet) => await api.post('/pets', newPet),
+    mutationFn: (newPet) => api.post('/pet', newPet),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['pets'] }),
-    onError: (error) => {
-      console.error("ERRO AO CRIAR PET:", error);
-      alert('Erro na API: Não foi possível salvar o pet. Verifique seu backend.');
-    }
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, ...petData }) => await api.put(`/pets/${id}`, petData),
+    mutationFn: ({ id, ...petData }) => api.put(`/pet/${id}`, petData),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['pets'] }),
-    onError: (error) => {
-      console.error("ERRO AO ATUALIZAR PET:", error);
-      alert('Erro na API: Não foi possível editar o pet. Verifique seu backend.');
-    }
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (petId) => await api.delete(`/pets/${petId}`),
+    mutationFn: (petId) => api.delete(`/pet/${petId}`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['pets'] }),
-    onError: (error) => {
-      console.error("ERRO AO EXCLUIR PET:", error);
-      alert('Erro na API: Não foi possível excluir o pet.');
-    }
   });
 
   return { query, createMutation, updateMutation, deleteMutation };

@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "clyvo-care-2sem",
+    "name": "Clyvo SmartCare",
     "slug": "clyvo-care-2sem",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "clyvocare2sem",
@@ -11,6 +11,7 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "package": "com.chrisdesousafreitas.clyvosmartcare",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -23,13 +24,19 @@
       "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
- "plugins": [
+    "plugins": [
       [
         "expo-splash-screen",
         {
           "backgroundColor": "#208AEF",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#1C8DA3"
         }
       ]
     ]
